@@ -75,6 +75,7 @@ export default function SignIn({
   const [success, setSuccess] = useState(false)
   const currenUser = useObservable(db.cloud.currentUser)
   const [isFocused, setIsFocused] = useState(false)
+  const ENABLE_GITHUB_LOGIN = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID != null
 
   useEffect(() => {
     if (
@@ -260,46 +261,47 @@ export default function SignIn({
                     }}
                   />
                 </form>
-                <Button
-                  component="a"
-                  onClick={signInWithGithub}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{
-                    margin: 'auto',
-                    mt: '20px',
-                    maxWidth: '350px',
-                    display: 'flex',
-                    minHeight: '40px', // motsvarar Tailwinds min-h-10 (ca 40px)
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: '10px', // fullt rundade hörn (rounded-full)
-                    border: '1px solid',
-                    borderColor: 'appcolor.400', // ersätt med önskad färg
-                    backgroundColor: 'appcolor.200', // ersätt med önskad färg
-                    fontSize: '0.875rem', // motsvarar text-sm
-                    color: 'textcolor.1000', // ersätt med önskad färg
-                    transition: 'background-color 250ms ease-in-out',
-                    textTransform: 'none',
-                    p: '8px',
-                    '&:hover': {
-                      backgroundColor: 'appcolor.300', // ersätt med önskad hover-färg
-                    },
-                  }}
-                >
-                  <svg
-                    role="img"
-                    viewBox="0 0 24 24"
-                    width="30"
-                    height="30"
-                    xmlns="http://www.w3.org/2000/svg"
-                    style={{ marginRight: '8px' }}
+                {ENABLE_GITHUB_LOGIN && (
+                  <Button
+                    component="a"
+                    onClick={signInWithGithub}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      margin: 'auto',
+                      mt: '20px',
+                      maxWidth: '350px',
+                      display: 'flex',
+                      minHeight: '40px', // motsvarar Tailwinds min-h-10 (ca 40px)
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '10px', // fullt rundade hörn (rounded-full)
+                      border: '1px solid',
+                      borderColor: 'appcolor.400', // ersätt med önskad färg
+                      backgroundColor: 'appcolor.200', // ersätt med önskad färg
+                      fontSize: '0.875rem', // motsvarar text-sm
+                      color: 'textcolor.1000', // ersätt med önskad färg
+                      transition: 'background-color 250ms ease-in-out',
+                      textTransform: 'none',
+                      p: '8px',
+                      '&:hover': {
+                        backgroundColor: 'appcolor.300', // ersätt med önskad hover-färg
+                      },
+                    }}
                   >
-                    <title>GitHub icon</title>
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M12 0C5.372 0 0 5.373 0 12c0 5.303 3.438 9.8 8.205 11.387.6.111.82-.261.82-.577
+                    <svg
+                      role="img"
+                      viewBox="0 0 24 24"
+                      width="30"
+                      height="30"
+                      xmlns="http://www.w3.org/2000/svg"
+                      style={{ marginRight: '8px' }}
+                    >
+                      <title>GitHub icon</title>
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M12 0C5.372 0 0 5.373 0 12c0 5.303 3.438 9.8 8.205 11.387.6.111.82-.261.82-.577
              0-.285-.011-1.04-.016-2.04-3.338.725-4.042-1.613-4.042-1.613-.546-1.386-1.333-1.755-1.333-1.755
              -1.089-.745.083-.729.083-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.304 3.495.997
              .108-.775.42-1.304.762-1.604-2.665-.303-5.467-1.333-5.467-5.933 0-1.312.47-2.381 1.235-3.221
@@ -308,11 +310,12 @@ export default function SignIn({
              0 4.609-2.807 5.625-5.479 5.921.431.372.815 1.102.815 2.222 0 1.606-.015 2.899-.015 3.293
              0 .319.217.694.825.576C20.565 21.795 24 17.298 24 12
              0-6.627-5.373-12-12-12z"
-                      fill="#181717"
-                    />
-                  </svg>
-                  Log in with GitHub
-                </Button>
+                        fill="#181717"
+                      />
+                    </svg>
+                    Log in with GitHub
+                  </Button>
+                )}
               </Box>
             ))}
 
