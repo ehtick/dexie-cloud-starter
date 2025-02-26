@@ -20,9 +20,10 @@ export const NavItem = ({ name, href }: NavItemProps) => {
         sx={{
           mx: 2,
           pt: 1,
-          borderTop: pathname.includes(href)
-            ? `solid 4px ${theme.palette.primary.main}`
-            : `solid 4px transparent`,
+          borderTop:
+            pathname.split('/')[1] == href.split('/')[1]
+              ? `solid 4px ${theme.palette.primary.main}`
+              : `solid 4px transparent`,
           fontSize: '1.2rem',
         }}
         color="primary"
