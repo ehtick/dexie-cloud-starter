@@ -248,8 +248,7 @@ export function shareSpaceList(space: ISpace, ...friends: DBRealmMember[]) {
 
       // Create a realm for the shared space. Use put to not fail if it already exists.
       // (Sync consistency)
-      db.realms.put({
-        realmId,
+      db.realms.upsert(realmId, {
         name: space.title,
         represents: 'A shared space of inspiration',
       })
