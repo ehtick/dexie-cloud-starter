@@ -8,30 +8,25 @@
     },
     {
       "groupName": "dexie packages",
-      "matchPackagePatterns": ["^dexie", "^y-dexie"],
-      "schedule": ["before 3am on Monday"]
+      "matchPackagePatterns": ["^dexie", "^y-dexie"]
     },
     {
       "groupName": "tiptap packages",
-      "matchPackagePatterns": ["^@tiptap/", "^tiptap-"],
-      "schedule": ["before 3am on Monday"]
+      "matchPackagePatterns": ["^@tiptap/", "^tiptap-"]
     },
     {
       "groupName": "MUI packages",
-      "matchPackagePatterns": ["^@mui/", "^@emotion/"],
-      "schedule": ["before 3am on Monday"]
+      "matchPackagePatterns": ["^@mui/", "^@emotion/"]
     },
     {
       "groupName": "Next.js and React",
       "matchPackageNames": ["next", "react", "react-dom"],
-      "matchPackagePatterns": ["^@types/react"],
-      "schedule": ["before 3am on Monday"]
+      "matchPackagePatterns": ["^@types/react"]
     },
     {
       "groupName": "devDependencies (non-major)",
       "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "schedule": ["before 3am on Monday"]
+      "matchUpdateTypes": ["minor", "patch"]
     }
   ],
   "vulnerabilityAlerts": {
