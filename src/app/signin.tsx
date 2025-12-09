@@ -3,6 +3,7 @@
 import { useObservable } from 'dexie-react-hooks'
 import { useEffect, useRef, useState } from 'react'
 import Head from 'next/head'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { DXCUserInteraction, resolveText } from 'dexie-cloud-addon'
 import {
@@ -134,11 +135,14 @@ export default function SignIn({
               textAlign: 'center',
             }}
           >
-            <img
+            <Image
               src="/company-icon.png"
               alt="Dexie Starter"
+              width={200}
+              height={200}
               style={{
                 maxWidth: '30%',
+                height: 'auto',
               }}
             />
           </Box>
