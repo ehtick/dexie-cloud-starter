@@ -1,17 +1,16 @@
 'use client'
 
+import { use } from 'react'
 import { Box, Typography } from '@mui/material'
 import { useLiveDataSpaces } from '@/app/db/db'
 import { useSearch } from '../../SearchContext'
 import CardList from '@/app/components/CardList'
 interface PageProps {
-  params: {
-    id: string
-  }
+  params: Promise<{ id: string }>
 }
 
 export default function Spaces({ params }: PageProps) {
-  const { id } = params
+  const { id } = use(params)
   const { searchKeyword } = useSearch()
 
   const space = useLiveDataSpaces(id)[0]
