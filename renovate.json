@@ -1,11 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
+  "stabilityDays": 1,
   "packageRules": [
-    {
-      "matchPackagePatterns": ["*"],
-      "rangeStrategy": "bump"
-    },
+    { "matchPackagePatterns": ["*"], "rangeStrategy": "bump" },
     {
       "groupName": "dexie packages",
       "matchPackagePatterns": ["^dexie", "^y-dexie"],
@@ -34,10 +32,7 @@
       "schedule": ["before 3am on Monday"]
     }
   ],
-  "vulnerabilityAlerts": {
-    "labels": ["security"],
-    "assignAutomerge": false
-  },
+  "vulnerabilityAlerts": { "labels": ["security"], "assignAutomerge": false },
   "prHourlyLimit": 3,
   "prConcurrentLimit": 10,
   "labels": ["dependencies"],
