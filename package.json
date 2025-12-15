@@ -47,13 +47,13 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.17.21",
-    "@types/node": "^24.10.2",
+    "@types/node": "^24.10.4",
     "@types/qs": "^6.14.0",
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.7",
     "@types/uuid": "^11.0.0",
-    "eslint": "^9.39.1",
-    "eslint-config-next": "^16.0.8",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.0.10",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3"
   }
