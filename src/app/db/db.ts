@@ -175,25 +175,8 @@ export const deleteSpace = async (space: ISpace) => {
   const tiedRealmId = getTiedRealmId(space.id)
 
   await db.transaction('rw', [db.cards, db.spaces, db.realms], async () => {
-    const currentSpace = await db.spaces.get(space.id)
-    if (!currentSpace) return
-
-    if (currentSpace.realmId) {
-      // Shared cards belong to the tied realm. Use both keys so unrelated
-      // cards in the same realm are never touched.
-      await db.cards
-        .where({ spaceId: space.id, realmId: currentSpace.realmId })
-        .delete()
-    } else {
-      // Private cards may have either the current user's private realm or no
-      // realmId yet, depending on whether the local mutation has synced.
-      await db.cards
-        .where({ spaceId: space.id, realmId: currentUserId })
-        .delete()
-      await db.cards.where({ spaceId: space.id, realmId: undefined }).delete()
-    }
+    await db.cards.where({ spaceId: space.id }).delete()
     await db.spaces.delete(space.id)
-
     // Deleting the tied realm also cascade-deletes its memberships on the
     // server. Do not delete db.members here.
     await db.realms.delete(tiedRealmId)
