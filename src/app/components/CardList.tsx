@@ -19,7 +19,12 @@ import Masonry from 'react-masonry-css'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import * as Y from 'yjs'
-import { useDocument, useLiveQuery, useObservable } from 'dexie-react-hooks'
+import {
+  useDocument,
+  useLiveQuery,
+  useObservable,
+  usePermissions,
+} from 'dexie-react-hooks'
 import NewCard from './NewCard'
 import ItemCard from './ItemCard'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
@@ -28,6 +33,8 @@ import {
   AutoSelectMember,
   db,
   deleteCard,
+  deleteSpace,
+  ISpaceList,
   shareSpaceList,
   unshareSpaceList,
   updateCardTitle,
@@ -63,6 +70,42 @@ interface CardListProps {
 }
 
 const filter = createFilterOptions<AutoSelectMember>()
+
+function DeleteSpaceButton({ space }: { space: ISpaceList }) {
+  const router = useRouter()
+  const permissions = usePermissions(db, 'spaces', space)
+
+  if (!permissions.delete()) return null
+
+  async function handleDeleteSpace() {
+    if (!confirm(`Delete space "${space.title}" and all its cards?`)) return
+
+    await deleteSpace(space)
+    router.push('/spaces')
+  }
+
+  return (
+    <Box
+      component="button"
+      type="button"
+      aria-label="Delete space"
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        cursor: 'pointer',
+        border: 0,
+        padding: 0,
+        background: 'none',
+        color: 'inherit',
+        font: 'inherit',
+      }}
+      onClick={handleDeleteSpace}
+    >
+      <DeleteOutlineIcon />
+      Delete
+    </Box>
+  )
+}
 
 export default function CardList({
   searchKeyword,
@@ -180,6 +223,7 @@ export default function CardList({
                 <GroupIcon />
                 Share
               </Box>
+              {space && <DeleteSpaceButton space={space} />}
             </Box>
           </Box>
           <Divider

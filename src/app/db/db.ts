@@ -47,7 +47,7 @@ export interface ISpaceList extends ISpace {
 // the URL, auto-authenticate that user (used for automated/local testing).
 const demoUser =
   typeof window !== 'undefined'
-    ? new URLSearchParams(window.location.search).get('demoUser') ?? undefined
+    ? (new URLSearchParams(window.location.search).get('demoUser') ?? undefined)
     : undefined
 
 export class DexieStarter extends Dexie {
@@ -161,6 +161,26 @@ export const deleteCard = async (id: string) => {
 
 export const createSpace = async (card: ISpace) => {
   await db.spaces.add(card)
+}
+
+/**
+ * Delete a space and all cards and the realm tied to it.
+ *
+ * This is deliberately a sync-consistent operation. UI visibility is governed
+ * by usePermissions(), while the server remains the final access-control
+ * authority if a stale client invokes the operation.
+ */
+export const deleteSpace = async (space: ISpace) => {
+  const currentUserId = db.cloud.currentUserId
+  const tiedRealmId = getTiedRealmId(space.id)
+
+  await db.transaction('rw', [db.cards, db.spaces, db.realms], async () => {
+    await db.cards.where({ spaceId: space.id }).delete()
+    await db.spaces.delete(space.id)
+    // Deleting the tied realm also cascade-deletes its memberships on the
+    // server. Do not delete db.members here.
+    await db.realms.delete(tiedRealmId)
+  })
 }
 
 export const useLiveDataSpaces = (id?: string): ISpaceList[] => {
