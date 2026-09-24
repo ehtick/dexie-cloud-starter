@@ -28,6 +28,7 @@ import {
   AutoSelectMember,
   db,
   deleteCard,
+  deleteSpace,
   shareSpaceList,
   unshareSpaceList,
   updateCardTitle,
@@ -89,6 +90,16 @@ export default function CardList({
     email: '',
   }
 
+  const canDeleteSpace =
+    !!space &&
+    (!space.realmId
+      ? !space.owner || space.owner === db.cloud.currentUserId
+      : members.some(
+          (member) =>
+            member.userId === db.cloud.currentUserId &&
+            member.owner === db.cloud.currentUserId,
+        ))
+
   useEffect(() => {
     const modalParam = searchParams.get('edit')
     setIsModalEdit(modalParam || undefined)
@@ -130,6 +141,14 @@ export default function CardList({
     members.push(member)
 
     unshareSpaceList(space, members)
+  }
+
+  async function handleDeleteSpace() {
+    if (!space) return
+    if (!confirm(`Delete space "${space.title}" and all its cards?`)) return
+
+    await deleteSpace(space)
+    router.push('/spaces')
   }
 
   if (!cards) {
@@ -180,6 +199,20 @@ export default function CardList({
                 <GroupIcon />
                 Share
               </Box>
+              {canDeleteSpace && (
+                <Box
+                  aria-label="Delete space"
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                  }}
+                  onClick={handleDeleteSpace}
+                >
+                  <DeleteOutlineIcon />
+                  Delete
+                </Box>
+              )}
             </Box>
           </Box>
           <Divider
