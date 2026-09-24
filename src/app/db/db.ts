@@ -166,9 +166,9 @@ export const createSpace = async (card: ISpace) => {
 /**
  * Delete a space and all cards and the realm tied to it.
  *
- * This is deliberately a sync-consistent operation. The server remains the
- * authority for ownership, but rejecting non-owner clients locally prevents a
- * misleading optimistic UI update.
+ * This is deliberately a sync-consistent operation. UI visibility is governed
+ * by usePermissions(), while the server remains the final access-control
+ * authority if a stale client invokes the operation.
  */
 export const deleteSpace = async (space: ISpace) => {
   const currentUserId = db.cloud.currentUserId
@@ -177,18 +177,6 @@ export const deleteSpace = async (space: ISpace) => {
   await db.transaction('rw', [db.cards, db.spaces, db.realms], async () => {
     const currentSpace = await db.spaces.get(space.id)
     if (!currentSpace) return
-
-    const realmId = currentSpace.realmId || tiedRealmId
-    const realm = await db.realms.get(realmId)
-
-    const isOwner =
-      (!currentSpace.owner || currentSpace.owner === currentUserId) &&
-      (!realm?.owner || realm.owner === currentUserId) &&
-      (!currentSpace.realmId || realm?.owner === currentUserId)
-
-    if (!isOwner) {
-      throw new Error('Only the space owner can delete a space')
-    }
 
     if (currentSpace.realmId) {
       // Shared cards belong to the tied realm. Use both keys so unrelated
