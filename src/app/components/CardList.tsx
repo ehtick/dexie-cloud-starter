@@ -201,11 +201,18 @@ export default function CardList({
               </Box>
               {canDeleteSpace && (
                 <Box
+                  component="button"
+                  type="button"
                   aria-label="Delete space"
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
                     cursor: 'pointer',
+                    border: 0,
+                    padding: 0,
+                    background: 'none',
+                    color: 'inherit',
+                    font: 'inherit',
                   }}
                   onClick={handleDeleteSpace}
                 >
