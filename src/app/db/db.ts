@@ -47,7 +47,7 @@ export interface ISpaceList extends ISpace {
 // the URL, auto-authenticate that user (used for automated/local testing).
 const demoUser =
   typeof window !== 'undefined'
-    ? new URLSearchParams(window.location.search).get('demoUser') ?? undefined
+    ? (new URLSearchParams(window.location.search).get('demoUser') ?? undefined)
     : undefined
 
 export class DexieStarter extends Dexie {
@@ -164,7 +164,7 @@ export const createSpace = async (card: ISpace) => {
 }
 
 /**
- * Delete a space and all cards and sharing metadata tied to it.
+ * Delete a space and all cards and the realm tied to it.
  *
  * This is deliberately a sync-consistent operation. The server remains the
  * authority for ownership, but rejecting non-owner clients locally prevents a
@@ -174,45 +174,42 @@ export const deleteSpace = async (space: ISpace) => {
   const currentUserId = db.cloud.currentUserId
   const tiedRealmId = getTiedRealmId(space.id)
 
-  await db.transaction(
-    'rw',
-    [db.cards, db.spaces, db.members, db.realms],
-    async () => {
-      const currentSpace = await db.spaces.get(space.id)
-      if (!currentSpace) return
+  await db.transaction('rw', [db.cards, db.spaces, db.realms], async () => {
+    const currentSpace = await db.spaces.get(space.id)
+    if (!currentSpace) return
 
-      const realmId = currentSpace.realmId || tiedRealmId
-      const realm = await db.realms.get(realmId)
-      const members = currentSpace.realmId
-        ? await db.members
-            .where('realmId')
-            .equals(currentSpace.realmId)
-            .toArray()
-        : []
-      const ownerMember = members.find(
-        (member) =>
-          member.userId === currentUserId && member.owner === currentUserId,
-      )
+    const realmId = currentSpace.realmId || tiedRealmId
+    const realm = await db.realms.get(realmId)
 
-      const isOwner =
-        (!currentSpace.owner || currentSpace.owner === currentUserId) &&
-        (!realm?.owner || realm.owner === currentUserId) &&
-        (!currentSpace.realmId ||
-          !!ownerMember ||
-          realm?.owner === currentUserId)
+    const isOwner =
+      (!currentSpace.owner || currentSpace.owner === currentUserId) &&
+      (!realm?.owner || realm.owner === currentUserId) &&
+      (!currentSpace.realmId || realm?.owner === currentUserId)
 
-      if (!isOwner) {
-        throw new Error('Only the space owner can delete a space')
-      }
+    if (!isOwner) {
+      throw new Error('Only the space owner can delete a space')
+    }
 
-      await db.cards.where('spaceId').equals(space.id).delete()
-      await db.spaces.delete(space.id)
+    if (currentSpace.realmId) {
+      // Shared cards belong to the tied realm. Use both keys so unrelated
+      // cards in the same realm are never touched.
+      await db.cards
+        .where({ spaceId: space.id, realmId: currentSpace.realmId })
+        .delete()
+    } else {
+      // Private cards may have either the current user's private realm or no
+      // realmId yet, depending on whether the local mutation has synced.
+      await db.cards
+        .where({ spaceId: space.id, realmId: currentUserId })
+        .delete()
+      await db.cards.where({ spaceId: space.id, realmId: undefined }).delete()
+    }
+    await db.spaces.delete(space.id)
 
-      // Deleting the tied realm also removes its memberships on the server.
-      // The operation is a no-op for a private space.
-      await db.realms.delete(tiedRealmId)
-    },
-  )
+    // Deleting the tied realm also cascade-deletes its memberships on the
+    // server. Do not delete db.members here.
+    await db.realms.delete(tiedRealmId)
+  })
 }
 
 export const useLiveDataSpaces = (id?: string): ISpaceList[] => {
